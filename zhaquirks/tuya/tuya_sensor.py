@@ -1,5 +1,7 @@
 """Tuya temp and humidity sensors."""
 
+import datetime
+
 from zigpy.quirks.v2 import EntityPlatform, EntityType
 from zigpy.quirks.v2.homeassistant import PERCENTAGE, UnitOfTemperature, UnitOfTime
 from zigpy.quirks.v2.homeassistant.sensor import SensorDeviceClass
@@ -33,8 +35,8 @@ class TuyaNousTempHumiAlarm(t.enum8):
 class NoManufTimeTuyaMCUCluster(TuyaMCUCluster):
     """Tuya Manufacturer Cluster with set_time mod."""
 
-    set_time_offset = 1970
-    set_time_local_offset = 1970
+    set_time_offset = datetime.datetime(1970, 1, 1, tzinfo=datetime.UTC)
+    set_time_local_offset = datetime.datetime(1970, 1, 1)
 
     class ServerCommandDefs(TuyaMCUCluster.ServerCommandDefs):
         """Server command definitions."""

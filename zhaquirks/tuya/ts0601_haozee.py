@@ -1,5 +1,6 @@
 """Map from manufacturer to standard clusters for thermostatic valves."""
 
+import datetime
 from typing import Final
 
 import zigpy.profiles.zha
@@ -79,8 +80,8 @@ class HY08WEManufCluster(TuyaManufClusterAttributes):
     """Manufacturer Specific Cluster of some thermostatic valves."""
 
     # Important! This device uses offset from 2000 year for UTC time and offset from 1970 for local time
-    set_time_offset = 2000
-    set_time_local_offset = 1970
+    set_time_offset = datetime.datetime(2000, 1, 1, tzinfo=datetime.UTC)
+    set_time_local_offset = datetime.datetime(1970, 1, 1)
 
     class AttributeDefs(TuyaManufClusterAttributes.AttributeDefs):
         """Attribute definitions."""

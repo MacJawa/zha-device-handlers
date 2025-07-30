@@ -5,8 +5,10 @@ import datetime
 import struct
 from typing import Final
 from unittest import mock
+from zoneinfo import ZoneInfo
 
 import pytest
+import time_machine
 from zigpy.device import Device
 from zigpy.profiles import zha
 from zigpy.quirks import CustomDevice, get_device
@@ -16,7 +18,7 @@ from zigpy.zcl.clusters.general import PowerConfiguration
 from zigpy.zcl.clusters.security import IasZone, ZoneStatus
 from zigpy.zcl.foundation import ZCLAttributeDef
 
-from tests.common import ClusterListener, MockDatetime, wait_for_zigpy_tasks
+from tests.common import ClusterListener, wait_for_zigpy_tasks
 import zhaquirks
 from zhaquirks.const import (
     DEVICE_TYPE,
@@ -723,6 +725,7 @@ async def test_valve_send_attribute(zigpy_device_from_quirk, quirk):
         assert status == foundation.Status.UNSUP_CLUSTER_COMMAND
 
 
+@time_machine.travel(datetime.datetime(1970, 1, 1, 1, 0, tzinfo=ZoneInfo("Etc/GMT+1")))
 @pytest.mark.parametrize("quirk", (zhaquirks.tuya.ts0601_trv.MoesHY368_Type1,))
 async def test_moes(zigpy_device_from_quirk, quirk):
     """Test thermostatic valve outgoing commands."""
@@ -1312,9 +1315,6 @@ async def test_moes(zigpy_device_from_quirk, quirk):
         _, status = await onoff_cluster.command(0x0009)
         assert status == foundation.Status.UNSUP_CLUSTER_COMMAND
 
-        origdatetime = datetime.datetime
-        datetime.datetime = MockDatetime
-
         hdr, args = tuya_cluster.deserialize(ZCL_TUYA_SET_TIME_REQUEST)
         tuya_cluster.handle_message(hdr, args)
         await wait_for_zigpy_tasks()
@@ -1329,7 +1329,6 @@ async def test_moes(zigpy_device_from_quirk, quirk):
             ask_for_ack=None,
             priority=None,
         )
-        datetime.datetime = origdatetime
 
 
 @pytest.mark.parametrize("quirk", (zhaquirks.tuya.ts0601_electric_heating.MoesBHT,))
