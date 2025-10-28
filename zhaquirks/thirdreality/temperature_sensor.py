@@ -11,7 +11,7 @@ from zigpy.zcl.foundation import BaseAttributeDefs, ZCLAttributeDef
 
 
 class ThirdRealityTemperatureAndHumidityCluster(CustomCluster):
-    """Third Reality's temperature and humidity sensor lite private cluster."""
+    """Third Reality's temperature and humidity sensor private cluster."""
 
     cluster_id = 0xFF01
 
@@ -37,10 +37,9 @@ class ThirdRealityTemperatureAndHumidityCluster(CustomCluster):
         )
 
 
-(
-    QuirkBuilder("Third Reality, Inc", "3RTHS0224Z")
+base_quirk = (
+    QuirkBuilder()
     .replaces(ThirdRealityTemperatureAndHumidityCluster)
-    .removes(PollControl.cluster_id)
     .number(
         attribute_name=ThirdRealityTemperatureAndHumidityCluster.AttributeDefs.temperature_correction_celsius.name,
         cluster_id=ThirdRealityTemperatureAndHumidityCluster.cluster_id,
@@ -77,5 +76,17 @@ class ThirdRealityTemperatureAndHumidityCluster(CustomCluster):
         translation_key="humidity_offset",
         fallback_name="Humidity offset",
     )
+)
+
+(
+    base_quirk.clone()
+    .applies_to("Third Reality, Inc", "3RTHS24BZ")
+    .add_to_registry()
+)  # fmt: skip
+
+(
+    base_quirk.clone()
+    .applies_to("Third Reality, Inc", "3RTHS0224Z")
+    .removes(PollControl.cluster_id)
     .add_to_registry()
 )
